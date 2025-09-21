@@ -1,0 +1,8 @@
+name: ElementNPC
+main: net.starelement.ElementNPC
+version: 1.0.0
+api:
+  - MOT
+  - 1.0.0
+load: STARTUP
+author: StarElement Dev

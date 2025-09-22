@@ -6,11 +6,8 @@ import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.data.EntityMetadata;
 import cn.nukkit.entity.data.Skin;
 import cn.nukkit.level.Level;
-import cn.nukkit.math.Vector3f;
-import cn.nukkit.network.protocol.AddPlayerPacket;
-import cn.nukkit.network.protocol.EmotePacket;
-import cn.nukkit.network.protocol.PlayerSkinPacket;
-import cn.nukkit.network.protocol.RemoveEntityPacket;
+import cn.nukkit.level.Position;
+import cn.nukkit.network.protocol.*;
 
 import java.util.Collection;
 import java.util.UUID;
@@ -21,7 +18,7 @@ public class NPC {
     private String name;
     private UUID uuid;
     private long runtimeId;
-    private Vector3f vector3f;
+    private Position position;
     private Server server = Server.getInstance();
     private String level;
     private boolean isSpawned;
@@ -50,8 +47,8 @@ public class NPC {
         return level;
     }
 
-    public void setPosition(Vector3f vector3f) {
-        this.vector3f = vector3f;
+    public void setPosition(Position position) {
+        this.position = position;
     }
 
     public void setLevel(String level) {
@@ -66,9 +63,9 @@ public class NPC {
         packet.entityUniqueId = runtimeId;
         packet.yaw = 0;
         packet.pitch = 0;
-        packet.x = vector3f.getX();
-        packet.y = vector3f.getY();
-        packet.z = vector3f.getZ();
+        packet.x = (float) position.getX();
+        packet.y = (float) position.getY();
+        packet.z = (float) position.getZ();
         packet.metadata = new EntityMetadata()
                 .putBoolean(Entity.DATA_ALWAYS_SHOW_NAMETAG, true)
                 .putFloat(Entity.DATA_SCALE, size);
@@ -103,11 +100,22 @@ public class NPC {
         }
     }
 
-    public void emote(Action action) {
+    public void emote(Emote emote) {
         EmotePacket packet = new EmotePacket();
         packet.runtimeId = runtimeId;
-        packet.emoteID = action.getId();
+        packet.emoteID = emote.getId();
         packet.flags = EmotePacket.FLAG_MUTE_ANNOUNCEMENT;
+        dataPacket(packet);
+    }
+
+    public void action(AnimatePacket.Action action) {
+        AnimatePacket packet = new AnimatePacket();
+        packet.action = action;
+        packet.eid = runtimeId;
+        dataPacket(packet);
+    }
+
+    public void dataPacket(DataPacket packet) {
         for (Player player : getLevelPlayers()) {
             player.dataPacket(packet);
         }

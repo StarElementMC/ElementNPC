@@ -1,6 +1,6 @@
 package net.starelement;
 
-public enum Action {
+public enum Emote {
 
     ABDUCTION("18891e6c-bb3d-47f6-bc15-265605d86525"),
     ACTION_LIKE_A_DRAGON("c2a47805-c792-4882-a56d-17c80b6c57a8"),
@@ -108,7 +108,7 @@ public enum Action {
 
     private final String uuid;
 
-    Action(String uuid) {
+    Emote(String uuid) {
         this.uuid = uuid;
     }
 

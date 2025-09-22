@@ -23,12 +23,20 @@ public class NPC {
     private String level;
     private boolean isSpawned;
     private float size = 1.0f;
+    private EntityMetadata metadata;
 
     protected NPC(Skin skin, String name) {
         this.skin = skin;
         this.name = name;
         this.uuid = UUID.randomUUID();
         this.runtimeId = randomRuntimeId();
+        this.metadata = new EntityMetadata();
+        this.metadata.putBoolean(Entity.DATA_ALWAYS_SHOW_NAMETAG, true);
+        this.metadata.putFloat(Entity.DATA_SCALE, size);
+    }
+
+    public void setMetadata(EntityMetadata metadata) {
+        this.metadata = metadata;
     }
 
     public long getRuntimeId() {
@@ -66,9 +74,7 @@ public class NPC {
         packet.x = (float) position.getX();
         packet.y = (float) position.getY();
         packet.z = (float) position.getZ();
-        packet.metadata = new EntityMetadata()
-                .putBoolean(Entity.DATA_ALWAYS_SHOW_NAMETAG, true)
-                .putFloat(Entity.DATA_SCALE, size);
+        packet.metadata = metadata;
         player.dataPacket(packet);
     }
 

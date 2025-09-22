@@ -100,12 +100,20 @@ public class NPC {
         }
     }
 
-    public void emote(Emote emote) {
+    public void emote(Emote emote, Player player) {
         EmotePacket packet = new EmotePacket();
         packet.runtimeId = runtimeId;
         packet.emoteID = emote.getId();
         packet.flags = EmotePacket.FLAG_MUTE_ANNOUNCEMENT;
-        dataPacket(packet);
+        if (player == null) {
+            dataPacket(packet);
+        } else {
+            player.dataPacket(packet);
+        }
+    }
+
+    public void emote(Emote emote) {
+        emote(emote, null);
     }
 
     public void action(AnimatePacket.Action action) {

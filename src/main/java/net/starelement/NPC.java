@@ -8,11 +8,14 @@ import cn.nukkit.entity.data.Skin;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.network.protocol.*;
+import cn.nukkit.utils.MainLogger;
 
 import java.util.Collection;
 import java.util.UUID;
 
 public class NPC {
+
+    public static double[] STADION_JUMP = {0.419, 0.333, 0.248, 0.164, 0.083, 0.003, -0.075, -0.152, -0.227, -0.301, -0.373, -0.121};
 
     private Skin skin;
     private String name;
@@ -61,10 +64,22 @@ public class NPC {
 
     public void setPosition(Position position) {
         this.position = position;
+        if (isSpawned) {
+            MoveEntityAbsolutePacket packet = new MoveEntityAbsolutePacket();
+            packet.eid = runtimeId;
+            packet.x = position.getX();
+            packet.y = position.getY();
+            packet.z = position.getZ();
+            dataPacket(packet);
+        }
     }
 
     public void setLevel(String level) {
         this.level = level;
+    }
+
+    public Position getPosition() {
+        return position;
     }
 
     public void setSkin(Skin skin) {
@@ -157,6 +172,28 @@ public class NPC {
         for (Player player : getLevelPlayers()) {
             player.dataPacket(packet);
         }
+    }
+
+    public void jump() {
+        new Thread(() -> {
+            double y = position.getY() + 1.8D;
+            MoveEntityAbsolutePacket packet = new MoveEntityAbsolutePacket();
+            for (double jump : STADION_JUMP) {
+                y += jump;
+                packet.y = y;
+                packet.x = position.getX();
+                packet.z = position.getZ();
+                packet.eid = runtimeId;
+                dataPacket(packet);
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    MainLogger.getLogger().logException(e);
+                }
+            }
+            packet.y = position.getY() + 1.8D;
+            dataPacket(packet);
+        }).start();
     }
 
     public Collection<Player> getLevelPlayers() {

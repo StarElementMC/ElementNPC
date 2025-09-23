@@ -55,12 +55,28 @@ public class NPC {
         return level;
     }
 
+    public UUID getUUID() {
+        return uuid;
+    }
+
     public void setPosition(Position position) {
         this.position = position;
     }
 
     public void setLevel(String level) {
         this.level = level;
+    }
+
+    public void setSkin(Skin skin) {
+        this.skin = skin;
+        if (isSpawned) {
+            PlayerSkinPacket packet = new PlayerSkinPacket();
+            packet.skin = skin;
+            packet.uuid = uuid;
+            packet.newSkinName = "Standard_Custom";
+            packet.oldSkinName = "Standard_Custom";
+            dataPacket(packet);
+        }
     }
 
     public void show(Player player) {
@@ -76,6 +92,14 @@ public class NPC {
         packet.z = (float) position.getZ();
         packet.metadata = metadata;
         player.dataPacket(packet);
+        if (skin != null) {
+            PlayerSkinPacket sp = new PlayerSkinPacket();
+            sp.skin = skin;
+            sp.uuid = uuid;
+            sp.newSkinName = "Standard_Custom";
+            sp.oldSkinName = "Standard_Custom";
+            player.dataPacket(sp);
+        }
     }
 
     public void hide(Player player) {

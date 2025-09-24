@@ -7,11 +7,11 @@
 
 在pom.xml中添加StarElement仓库
 ```xml
-    <repository>
-        <id>se-repo</id>
-        <name>StarElement Repository</name>
-        <url>https://repo.starelement.net/maven-public/</url>
-    </repository>
+<repository>
+    <id>se-repo</id>
+    <name>StarElement Repository</name>
+    <url>https://repo.starelement.net/maven-public/</url>
+</repository>
 ```
 
 添加依赖

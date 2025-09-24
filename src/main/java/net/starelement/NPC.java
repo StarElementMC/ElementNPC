@@ -16,6 +16,7 @@ import java.util.UUID;
 public class NPC {
 
     public static double[] STADION_JUMP = {0.419, 0.333, 0.248, 0.164, 0.083, 0.003, -0.075, -0.152, -0.227, -0.301, -0.373, -0.121};
+    public static double HEIGHT_OFFSET = 1.62D;
 
     private Skin skin;
     private String name;
@@ -25,7 +26,6 @@ public class NPC {
     private Server server = Server.getInstance();
     private String level;
     private boolean isSpawned;
-    private float size = 1.0f;
     private EntityMetadata metadata;
 
     protected NPC(Skin skin, String name) {
@@ -35,7 +35,7 @@ public class NPC {
         this.runtimeId = randomRuntimeId();
         this.metadata = new EntityMetadata();
         this.metadata.putBoolean(Entity.DATA_ALWAYS_SHOW_NAMETAG, true);
-        this.metadata.putFloat(Entity.DATA_SCALE, size);
+        this.metadata.putFloat(Entity.DATA_SCALE, 1.0F);
     }
 
     public void setMetadata(EntityMetadata metadata) {
@@ -68,10 +68,20 @@ public class NPC {
             MoveEntityAbsolutePacket packet = new MoveEntityAbsolutePacket();
             packet.eid = runtimeId;
             packet.x = position.getX();
-            packet.y = position.getY();
+            packet.y = position.getY() + HEIGHT_OFFSET;
             packet.z = position.getZ();
+            packet.onGround = true;
             dataPacket(packet);
         }
+    }
+
+    public void move(Position position) {
+        setPosition(position);
+    }
+
+    public void setScale(float scale) {
+        metadata.putFloat(Entity.DATA_SCALE, scale);
+        update();
     }
 
     public void setLevel(String level) {
@@ -174,9 +184,18 @@ public class NPC {
         }
     }
 
+    public void update() {
+        if (isSpawned) {
+            SetEntityDataPacket packet = new SetEntityDataPacket();
+            packet.eid = runtimeId;
+            packet.metadata = metadata;
+            dataPacket(packet);
+        }
+    }
+
     public void jump() {
         new Thread(() -> {
-            double y = position.getY() + 1.8D;
+            double y = position.getY() + HEIGHT_OFFSET;
             MoveEntityAbsolutePacket packet = new MoveEntityAbsolutePacket();
             for (double jump : STADION_JUMP) {
                 y += jump;
@@ -191,7 +210,8 @@ public class NPC {
                     MainLogger.getLogger().logException(e);
                 }
             }
-            packet.y = position.getY() + 1.8D;
+            packet.y = position.getY() + HEIGHT_OFFSET;
+            packet.onGround = true;
             dataPacket(packet);
         }).start();
     }
